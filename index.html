@@ -1,24 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>玄学数字转盘</title>
+
+<style>
+
+body{
+background:#062b15;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+h1{
+color:#00ff66;
+}
+
+#wheel{
+margin:30px auto;
+width:350px;
+height:350px;
+border-radius:50%;
+border:12px solid #00ff66;
+
+background:
+conic-gradient(
+#00ff66 0deg 36deg,
+#004d20 36deg 72deg,
+#00ff66 72deg 108deg,
+#004d20 108deg 144deg,
+#00ff66 144deg 180deg,
+#004d20 180deg 216deg,
+#00ff66 216deg 252deg,
+#004d20 252deg 288deg,
+#00ff66 288deg 324deg,
+#004d20 324deg 360deg
+);
+
+transition:transform 5s cubic-bezier(.17,.67,.12,.99);
+
+}
+
+button{
+
+background:#00ff66;
+border:none;
+padding:15px 40px;
+font-size:22px;
+border-radius:20px;
+cursor:pointer;
+
+}
+
+#result{
+
+font-size:35px;
+margin-top:30px;
+color:#00ff66;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<h1>🟢 玄学数字转盘 🟢</h1>
+
+
+<div id="wheel"></div>
+
+
+<button onclick="spin()">
+开始转盘
+</button>
+
+
+<div id="result">
+等待开奖
+</div>
+
+
+
+<audio id="tick">
+<source src="https://actions.google.com/sounds/v1/foley/wood_plank_flicks.ogg">
+</audio>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+
+const supabaseUrl="你的SUPABASE地址";
+
+const supabaseKey="你的SUPABASEKEY";
+
+
+const supabase =
+supabase.createClient(
+supabaseUrl,
+supabaseKey
+);
+
+
+
+let spinning=false;
+
+
+
+async function spin(){
+
+
+if(spinning)return;
+
+spinning=true;
+
+
+
+let num=Math.floor(Math.random()*100)+1;
+
+
+let deg=360*10+num*3.6;
+
+
+document.getElementById("wheel")
+.style.transform=
+`rotate(${deg}deg)`;
+
+
+
+let audio=document.getElementById("tick");
+
+audio.currentTime=0;
+audio.play();
+
+
+
 setTimeout(async()=>{
+
 
 document.getElementById("result")
 .innerHTML=
-"✨ 心诚结果："+num+" ✨";
+"🎉 你的数字："+num;
 
 
-// 上传 Supabase
-const {error}=await supabaseClient
-.from("玄学")
+
+await supabase
+.from("wheel_results")
 .insert({
-    结果:num
+
+result:String(num)
+
 });
 
-
-if(error){
-    console.log(error);
-}
 
 
 spinning=false;
 
 
-},5000);
+
+},5200);
+
+
+
+}
+
+
+
+</script>
+
+
+</body>
+</html>
