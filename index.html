@@ -2,67 +2,61 @@
 <html>
 <head>
 <meta charset="UTF-8">
-
 <title>玄学数字转盘</title>
 
 <style>
-
 body{
-background:#062b15;
-color:white;
-font-family:Arial;
+margin:0;
+background:#002b16;
+color:#00ff88;
+font-family:sans-serif;
 text-align:center;
 }
 
 h1{
-color:#00ff66;
+margin-top:40px;
 }
 
 #wheel{
-margin:30px auto;
+margin:40px auto;
 width:350px;
 height:350px;
 border-radius:50%;
-border:12px solid #00ff66;
-
-background:
-conic-gradient(
-#00ff66 0deg 36deg,
-#004d20 36deg 72deg,
-#00ff66 72deg 108deg,
-#004d20 108deg 144deg,
-#00ff66 144deg 180deg,
-#004d20 180deg 216deg,
-#00ff66 216deg 252deg,
-#004d20 252deg 288deg,
-#00ff66 288deg 324deg,
-#004d20 324deg 360deg
+border:10px solid #00ff88;
+background:conic-gradient(
+#00ff88 0deg 45deg,
+#003b20 45deg 90deg,
+#00ff88 90deg 135deg,
+#003b20 135deg 180deg,
+#00ff88 180deg 225deg,
+#003b20 225deg 270deg,
+#00ff88 270deg 315deg,
+#003b20 315deg 360deg
 );
+transition:5s cubic-bezier(.17,.67,.12,.99);
+position:relative;
+}
 
-transition:transform 5s cubic-bezier(.17,.67,.12,.99);
-
+.num{
+position:absolute;
+font-size:35px;
+font-weight:bold;
+color:white;
 }
 
 button{
-
-background:#00ff66;
-border:none;
-padding:15px 40px;
+background:#00ff88;
+border:0;
+padding:18px 50px;
 font-size:22px;
-border-radius:20px;
+border-radius:30px;
 cursor:pointer;
-
 }
 
 #result{
-
 font-size:35px;
 margin-top:30px;
-color:#00ff66;
-
 }
-
-
 </style>
 
 </head>
@@ -70,27 +64,15 @@ color:#00ff66;
 
 <body>
 
+<h1>🟢 心诚则灵 🟢</h1>
 
-<h1>🟢 玄学数字转盘 🟢</h1>
-
-
-<div id="wheel"></div>
-
-
-<button onclick="spin()">
-开始转盘
-</button>
-
-
-<div id="result">
-等待开奖
+<div id="wheel">
 </div>
 
 
+<button onclick="start()">开始转盘</button>
 
-<audio id="tick">
-<source src="https://actions.google.com/sounds/v1/foley/wood_plank_flicks.ogg">
-</audio>
+<div id="result"></div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -99,72 +81,63 @@ color:#00ff66;
 <script>
 
 
-const supabaseUrl="你的SUPABASE地址";
+const SUPABASE_URL=
+"https://bnthccgpdtxrehunvtbg.supabase.co";
 
-const supabaseKey="你的SUPABASEKEY";
+
+const SUPABASE_KEY=
+"你的sb_publishable";
 
 
-const supabase =
-supabase.createClient(
-supabaseUrl,
-supabaseKey
+const client=supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
 );
 
 
 
-let spinning=false;
+let wheel=document.getElementById("wheel");
 
 
-
-async function spin(){
-
-
-if(spinning)return;
-
-spinning=true;
+let deg=0;
 
 
-
-let num=Math.floor(Math.random()*100)+1;
-
-
-let deg=360*10+num*3.6;
+function start(){
 
 
-document.getElementById("wheel")
-.style.transform=
-`rotate(${deg}deg)`;
+let audio=new Audio(
+"https://cdn.pixabay.com/audio/2022/03/15/audio_9c2f2c4b3d.mp3"
+);
 
-
-
-let audio=document.getElementById("tick");
-
-audio.currentTime=0;
 audio.play();
 
+
+let num=Math.floor(Math.random()*8)+1;
+
+
+deg+=1800+(num*45);
+
+
+wheel.style.transform=
+`rotate(${deg}deg)`;
 
 
 setTimeout(async()=>{
 
 
-document.getElementById("result")
-.innerHTML=
-"🎉 你的数字："+num;
+document.getElementById("result").innerHTML=
+"✨ 心诚则灵："+num+" ✨";
 
 
+//写入数据库
 
-await supabase
+await client
 .from("wheel_results")
 .insert({
 
 result:String(num)
 
 });
-
-
-
-spinning=false;
-
 
 
 },5200);
