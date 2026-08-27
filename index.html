@@ -4,45 +4,160 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>抖音幸运转盘</title>
+<title>心诚则灵</title>
 
 <style>
 
-body{
+*{
 margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+
+body{
+
 height:100vh;
-background:#111;
+
+background:
+radial-gradient(circle,#164d24,#020805);
+
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
-font-family:"Microsoft Yahei";
+
+font-family:"Microsoft YaHei";
+
 color:white;
+
+overflow:hidden;
+
 }
+
 
 h1{
+
+font-size:42px;
+
+letter-spacing:12px;
+
+color:#b9ff9c;
+
+text-shadow:
+0 0 15px #55ff55,
+0 0 30px #22ff22;
+
 margin-bottom:20px;
+
 }
+
+
+
+.wheelBox{
+
+position:relative;
+
+}
+
+
 
 canvas{
-background:white;
+
 border-radius:50%;
+
+box-shadow:
+
+0 0 30px #65ff65,
+
+0 0 80px #20aa40;
+
 }
+
+
+
+.pointer{
+
+position:absolute;
+
+top:-25px;
+
+left:50%;
+
+transform:translateX(-50%);
+
+width:0;
+
+height:0;
+
+border-left:25px solid transparent;
+
+border-right:25px solid transparent;
+
+border-top:60px solid #ffe27a;
+
+filter:
+drop-shadow(0 0 10px gold);
+
+z-index:10;
+
+}
+
+
 
 button{
+
 margin-top:30px;
-padding:15px 40px;
-font-size:22px;
+
+width:240px;
+
+height:60px;
+
+border-radius:40px;
+
 border:none;
-border-radius:10px;
-background:#ff0050;
+
+font-size:26px;
+
+font-weight:bold;
+
 color:white;
+
+background:
+
+linear-gradient(#6cff6c,#159b35);
+
+box-shadow:
+
+0 0 25px #40ff40;
+
+
 cursor:pointer;
+
 }
 
-#msg{
-margin-top:20px;
-font-size:20px;
+
+
+button:active{
+
+transform:scale(.95);
+
+}
+
+
+
+#result{
+
+margin-top:25px;
+
+font-size:32px;
+
+color:#d8ffbd;
+
+text-shadow:
+
+0 0 15px green;
+
 }
 
 </style>
@@ -53,129 +168,198 @@ font-size:20px;
 <body>
 
 
-<h1>🎁 幸运转盘</h1>
+<h1>心诚则灵</h1>
 
 
-<canvas id="wheel" width="400" height="400"></canvas>
+<div class="wheelBox">
 
 
-<button onclick="spin()">开始抽奖</button>
+<div class="pointer"></div>
 
 
-<div id="msg"></div>
+<canvas 
+id="wheel"
+width="500"
+height="500">
+</canvas>
+
+
+</div>
+
+
+
+<button onclick="spin()">
+开始转动
+</button>
+
+
+<div id="result">
+本次结果：-
+</div>
 
 
 
 <script>
 
 
-// ====== Supabase配置 ======
-
-const SUPABASE_URL =
-"https://bnthccgpdtxrehunvtbg.supabase.co";
-
-
-const SUPABASE_KEY =
-"sb_publishable_PcqKnL7U0klVW4LUmSNTrw_HxZ3KCgL";
-
-
-const headers={
-"apikey":SUPABASE_KEY,
-"Authorization":"Bearer "+SUPABASE_KEY,
-"Content-Type":"application/json"
-};
-
-
-
-// ===== 转盘 =====
-
-
 const canvas=document.getElementById("wheel");
+
 const ctx=canvas.getContext("2d");
 
 
-const numbers=[
-"1等奖",
-"2等奖",
-"3等奖",
-"谢谢参与",
-"红包",
-"礼品",
-"免单",
-"积分",
-"再来一次"
+
+const nums=[
+"1","2","3","4",
+"5","6","7","8"
 ];
 
 
 const colors=[
-"#ff1744",
-"#ff9100",
-"#ffee00",
-"#00e676",
-"#00b0ff",
-"#651fff",
-"#d500f9",
-"#ff4081",
-"#795548"
+
+"#2e7d32",
+"#66bb6a",
+"#1b5e20",
+"#81c784",
+
+"#388e3c",
+"#a5d6a7",
+"#43a047",
+"#c5e1a5"
+
 ];
 
 
+
 let angle=0;
+
 let spinning=false;
 
 
 
 function draw(){
 
-let r=200;
-let part=Math.PI*2/numbers.length;
+
+let center=250;
+
+let r=230;
+
+let part=Math.PI*2/8;
 
 
-ctx.clearRect(0,0,400,400);
+
+ctx.clearRect(0,0,500,500);
 
 
-for(let i=0;i<numbers.length;i++){
+
+for(let i=0;i<8;i++){
+
 
 ctx.beginPath();
 
-ctx.moveTo(200,200);
+ctx.moveTo(center,center);
 
-ctx.fillStyle=colors[i];
 
 ctx.arc(
-200,
-200,
+
+center,
+center,
 r,
-i*part+angle,
-(i+1)*part+angle
+
+angle+i*part,
+
+angle+(i+1)*part
+
 );
+
+
+ctx.fillStyle=colors[i];
 
 ctx.fill();
 
 
+
+ctx.strokeStyle="#d6ff9c";
+
+ctx.lineWidth=3;
+
+ctx.stroke();
+
+
+
 ctx.save();
 
-ctx.translate(200,200);
+
+
+ctx.translate(center,center);
+
 
 ctx.rotate(
-i*part+part/2+angle
+angle+i*part+part/2
 );
+
 
 
 ctx.fillStyle="white";
-ctx.font="20px Arial";
-ctx.textAlign="right";
+
+ctx.font="bold 50px Arial";
+
+ctx.textAlign="center";
+
 
 ctx.fillText(
-numbers[i],
-170,
-10
+nums[i],
+150,
+15
 );
+
 
 
 ctx.restore();
 
+
 }
+
+
+
+//中心莲花按钮
+
+
+ctx.beginPath();
+
+ctx.arc(
+250,
+250,
+65,
+0,
+Math.PI*2
+);
+
+
+ctx.fillStyle="#e8c85b";
+
+ctx.fill();
+
+
+ctx.strokeStyle="#fff3a0";
+
+ctx.lineWidth=5;
+
+ctx.stroke();
+
+
+
+ctx.fillStyle="#145214";
+
+ctx.font="bold 25px Microsoft YaHei";
+
+ctx.textAlign="center";
+
+
+ctx.fillText(
+"转动",
+250,
+260
+);
 
 
 }
@@ -183,37 +367,6 @@ ctx.restore();
 
 
 draw();
-
-
-
-
-
-async function saveResult(result){
-
-
-await fetch(
-SUPABASE_URL+"/rest/v1/wheel_results",
-{
-
-method:"POST",
-
-headers:headers,
-
-body:JSON.stringify({
-
-name:"游客",
-
-result:result
-
-})
-
-}
-
-);
-
-
-}
-
 
 
 
@@ -228,9 +381,12 @@ if(spinning)return;
 spinning=true;
 
 
-let speed=Math.random()*0.3+0.3;
+let speed=
+Math.random()*0.4+0.5;
 
-let total=0;
+
+let count=0;
+
 
 
 let timer=setInterval(()=>{
@@ -238,42 +394,50 @@ let timer=setInterval(()=>{
 
 angle+=speed;
 
-speed*=0.985;
 
-total+=speed;
+speed*=0.985;
 
 
 draw();
 
 
+count++;
 
-if(total>25){
+
+
+if(count>220){
 
 
 clearInterval(timer);
 
+
 spinning=false;
 
 
-//计算最终结果
+
+let part=Math.PI*2/8;
+
+
 
 let index=Math.floor(
-(numbers.length -
-((angle%(Math.PI*2))/(Math.PI*2)*numbers.length))
-)%numbers.length;
+
+(
+Math.PI*2-
+(angle%(Math.PI*2))
+)
+
+/
+part
+
+)%8;
 
 
-let result=numbers[index];
 
+document
+.getElementById("result")
+.innerHTML=
 
-
-document.getElementById("msg").innerHTML=
-"🎉 恭喜："+result;
-
-
-
-saveResult(result);
-
+"✨ 本次结果："+nums[index];
 
 
 }
