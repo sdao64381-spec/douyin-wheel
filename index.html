@@ -15,13 +15,13 @@ text-align:center;
 
 h1{
 margin-top:40px;
-font-size:42px;
+font-size:48px;
 }
 
 #wheel{
 width:420px;
 height:420px;
-margin:40px auto;
+margin:50px auto;
 border-radius:50%;
 border:8px solid #00ff88;
 background:conic-gradient(
@@ -35,32 +35,44 @@ background:conic-gradient(
 #003b20 315deg 360deg
 );
 position:relative;
-transition:transform 5s cubic-bezier(.2,.8,.2,1);
+transition:5s;
 }
 
 .num{
 position:absolute;
-left:190px;
-top:185px;
-font-size:40px;
+width:50px;
+height:50px;
+line-height:50px;
+font-size:36px;
 font-weight:bold;
 color:white;
-transform-origin:20px 25px;
 }
 
+.n1{top:20px;left:185px;}
+.n2{top:70px;right:70px;}
+.n3{top:185px;right:20px;}
+.n4{bottom:70px;right:70px;}
+.n5{bottom:20px;left:185px;}
+.n6{bottom:70px;left:70px;}
+.n7{top:185px;left:20px;}
+.n8{top:70px;left:70px;}
+
+
 button{
-background:#00ff88;
+font-size:28px;
+padding:15px 50px;
 border:0;
-padding:20px 50px;
-font-size:25px;
-border-radius:40px;
+border-radius:30px;
+background:#00ff88;
 cursor:pointer;
 }
 
 #result{
 font-size:35px;
 margin-top:30px;
+color:white;
 }
+
 </style>
 </head>
 
@@ -69,16 +81,20 @@ margin-top:30px;
 
 <h1>🟢 心诚则灵 🟢</h1>
 
+
 <div id="wheel">
-<div class="num" style="transform:rotate(0deg) translateY(-160px)">1</div>
-<div class="num" style="transform:rotate(45deg) translateY(-160px)">2</div>
-<div class="num" style="transform:rotate(90deg) translateY(-160px)">3</div>
-<div class="num" style="transform:rotate(135deg) translateY(-160px)">4</div>
-<div class="num" style="transform:rotate(180deg) translateY(-160px)">5</div>
-<div class="num" style="transform:rotate(225deg) translateY(-160px)">6</div>
-<div class="num" style="transform:rotate(270deg) translateY(-160px)">7</div>
-<div class="num" style="transform:rotate(315deg) translateY(-160px)">8</div>
+
+<div class="num n1">1</div>
+<div class="num n2">2</div>
+<div class="num n3">3</div>
+<div class="num n4">4</div>
+<div class="num n5">5</div>
+<div class="num n6">6</div>
+<div class="num n7">7</div>
+<div class="num n8">8</div>
+
 </div>
+
 
 <button onclick="spin()">开始转盘</button>
 
@@ -87,20 +103,18 @@ margin-top:30px;
 
 <script>
 
-let wheel=document.getElementById("wheel");
-
 function spin(){
 
-let num=Math.floor(Math.random()*8)+1;
+let r=Math.floor(Math.random()*8)+1;
 
-let deg=1800+(num*45);
+document.getElementById("wheel").style.transform=
+"rotate("+(1440+Math.random()*360)+"deg)";
 
-wheel.style.transform="rotate("+deg+"deg)";
 
 setTimeout(()=>{
 
 document.getElementById("result").innerHTML=
-"✨ 心诚则灵：数字 "+num+" ✨";
+"✨ 心诚结果："+r+" ✨";
 
 },5000);
 
