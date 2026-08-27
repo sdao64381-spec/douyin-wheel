@@ -5,6 +5,7 @@
 <title>心诚则灵</title>
 
 <style>
+
 body{
 margin:0;
 background:#002b16;
@@ -15,110 +16,134 @@ text-align:center;
 
 h1{
 margin-top:40px;
-font-size:48px;
 }
 
 #wheel{
-width:420px;
-height:420px;
-margin:50px auto;
+width:320px;
+height:320px;
 border-radius:50%;
-border:8px solid #00ff88;
+margin:60px auto 30px;
+
 background:conic-gradient(
 #00ff88 0deg 45deg,
-#003b20 45deg 90deg,
+#003b22 45deg 90deg,
 #00ff88 90deg 135deg,
-#003b20 135deg 180deg,
+#003b22 135deg 180deg,
 #00ff88 180deg 225deg,
-#003b20 225deg 270deg,
+#003b22 225deg 270deg,
 #00ff88 270deg 315deg,
-#003b20 315deg 360deg
+#003b22 315deg 360deg
 );
-position:relative;
-transition:5s;
-}
 
-.num{
-position:absolute;
-width:50px;
-height:50px;
-line-height:50px;
-font-size:36px;
-font-weight:bold;
-color:white;
-}
+border:8px solid #00ff88;
 
-.n1{top:20px;left:185px;}
-.n2{top:70px;right:70px;}
-.n3{top:185px;right:20px;}
-.n4{bottom:70px;right:70px;}
-.n5{bottom:20px;left:185px;}
-.n6{bottom:70px;left:70px;}
-.n7{top:185px;left:20px;}
-.n8{top:70px;left:70px;}
+transition:transform 5s cubic-bezier(.17,.67,.12,.99);
+
+}
 
 
 button{
-font-size:28px;
-padding:15px 50px;
-border:0;
-border-radius:30px;
+
 background:#00ff88;
-cursor:pointer;
+border:0;
+padding:20px 60px;
+border-radius:40px;
+font-size:22px;
+
 }
 
+
 #result{
-font-size:35px;
+
 margin-top:30px;
-color:white;
+font-size:30px;
+
 }
 
 </style>
+
 </head>
 
 
 <body>
 
+
 <h1>🟢 心诚则灵 🟢</h1>
 
 
-<div id="wheel">
-
-<div class="num n1">1</div>
-<div class="num n2">2</div>
-<div class="num n3">3</div>
-<div class="num n4">4</div>
-<div class="num n5">5</div>
-<div class="num n6">6</div>
-<div class="num n7">7</div>
-<div class="num n8">8</div>
-
-</div>
+<div id="wheel"></div>
 
 
-<button onclick="spin()">开始转盘</button>
+<button onclick="spin()">
+开始转盘
+</button>
+
 
 <div id="result"></div>
 
 
+
 <script>
+
 
 function spin(){
 
+
 let r=Math.floor(Math.random()*8)+1;
 
+
+let deg=1440+Math.random()*360;
+
+
 document.getElementById("wheel").style.transform=
-"rotate("+(1440+Math.random()*360)+"deg)";
+"rotate("+deg+"deg)";
+
 
 
 setTimeout(()=>{
 
+
 document.getElementById("result").innerHTML=
 "✨ 心诚结果："+r+" ✨";
 
-},5000);
+
+
+// 写入Supabase
+
+fetch(
+"https://bnthccgpdtxrehunvtbg.supabase.co/rest/v1/%E8%BD%A6%E8%BD%AE%E7%BB%93%E6%9E%9C",
+{
+
+method:"POST",
+
+headers:{
+
+"apikey":"sb_publishable_PcqKnL7U0klVW4LUmSNTrw_HxZ3KCgL",
+
+"Authorization":"Bearer sb_publishable_PcqKnL7U0klVW4LUmSNTrw_HxZ3KCgL",
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+结果:"数字 "+r
+
+})
 
 }
+
+);
+
+
+
+},5000);
+
+
+
+}
+
 
 </script>
 
