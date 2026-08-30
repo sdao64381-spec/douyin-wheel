@@ -105,7 +105,7 @@ button:disabled{
    ========================= */
 
 const SUPABASE_URL =
-    "https://bnthccgp dtxrehunvtbg.supabase.co".replace(" ","");
+    "https://bnthccgpdtxrehunvtbg.supabase.co";
 
 const SUPABASE_KEY =
     "sb_publishable_PcqKnL7U0klVW4LUmSNTrw_HxZ3KCgL";
@@ -118,9 +118,15 @@ const SUPABASE_KEY =
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
+
+/*
+   你的转盘是 1～8
+*/
+
 const numbers = [
-    "1","2","3","4","5","6","7","8","9"
+    "1","2","3","4","5","6","7","8"
 ];
+
 
 const colors = [
     "#ff1744",
@@ -130,9 +136,9 @@ const colors = [
     "#00b0ff",
     "#651fff",
     "#d500f9",
-    "#ff4081",
-    "#ff1744"
+    "#ff4081"
 ];
+
 
 let angle = 0;
 let spinning = false;
@@ -148,6 +154,7 @@ function draw(){
     const part = Math.PI * 2 / numbers.length;
 
     ctx.clearRect(0,0,360,360);
+
 
     for(let i=0;i<numbers.length;i++){
 
@@ -166,6 +173,7 @@ function draw(){
         );
 
         ctx.fill();
+
 
         /* 数字 */
 
@@ -236,7 +244,7 @@ async function saveResult(number){
     try{
 
         const response = await fetch(
-            SUPABASE_URL + "/rest/v1/%E8%BD%A6%E8%BD%AE%E7%BB%93%E6%9E%9C",
+            SUPABASE_URL + "/rest/v1/wheel_results",
             {
                 method:"POST",
 
@@ -247,8 +255,13 @@ async function saveResult(number){
                     "Prefer":"return=minimal"
                 },
 
+                /*
+                   注意：
+                   Supabase 表里的字段叫 result
+                */
+
                 body:JSON.stringify({
-                    "结果":number
+                    result:number
                 })
             }
         );
@@ -267,12 +280,14 @@ async function saveResult(number){
             return false;
         }
 
+
         console.log(
             "✅ 已成功写入 Supabase：",
             number
         );
 
         return true;
+
 
     }catch(error){
 
@@ -296,6 +311,7 @@ function spin(){
         return;
     }
 
+
     spinning = true;
 
     document.getElementById("spinButton").disabled = true;
@@ -305,8 +321,7 @@ function spin(){
 
 
     /*
-      先随机决定最终结果
-      这样显示的数字和实际记录完全一致
+      随机决定最终结果
     */
 
     const resultIndex =
@@ -317,7 +332,7 @@ function spin(){
 
 
     /*
-      让转盘转很多圈
+      每一格的角度
     */
 
     const part =
@@ -325,8 +340,7 @@ function spin(){
 
 
     /*
-      指针在正上方。
-      把目标数字转到正上方。
+      把目标数字转到正上方
     */
 
     const targetAngle =
@@ -342,23 +356,33 @@ function spin(){
         targetAngle;
 
 
+    /*
+      至少旋转 6 圈
+    */
+
     while(finalAngle < current + Math.PI * 2 * 6){
+
         finalAngle += Math.PI * 2;
+
     }
 
 
     const startAngle = angle;
-    const distance = finalAngle - startAngle;
+
+    const distance =
+        finalAngle - startAngle;
 
     const duration = 5000;
 
-    const startTime = performance.now();
+    const startTime =
+        performance.now();
 
 
     function animate(now){
 
         const elapsed =
             now - startTime;
+
 
         let progress =
             Math.min(elapsed / duration,1);
@@ -375,6 +399,7 @@ function spin(){
         angle =
             startAngle + distance * eased;
 
+
         draw();
 
 
@@ -388,19 +413,22 @@ function spin(){
 
             draw();
 
+
             spinning = false;
 
             document.getElementById("spinButton").disabled = false;
+
 
             document.getElementById("result").innerHTML =
                 "🎉 幸运数字：" + resultNumber;
 
 
             /*
-              写入 Supabase
+              转盘结束后写入 Supabase
             */
 
             saveResult(resultNumber);
+
         }
     }
 
