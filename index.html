@@ -1,65 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>心诚则灵</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>心诚则灵转盘</title>
 
 <style>
-
 body{
-margin:0;
-background:#002b16;
-color:#00ff88;
-font-family:sans-serif;
-text-align:center;
+    margin:0;
+    height:100vh;
+    background:radial-gradient(circle,#222,#000);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    font-family:"Microsoft YaHei";
+    overflow:hidden;
 }
 
-h1{
-margin-top:40px;
+.wheel-box{
+    position:relative;
+    width:360px;
+    height:360px;
 }
 
-#wheel{
-width:320px;
-height:320px;
-border-radius:50%;
-margin:60px auto 30px;
+canvas{
+    border-radius:50%;
+    box-shadow:
+    0 0 20px #fff,
+    0 0 60px gold;
+}
 
-background:conic-gradient(
-#00ff88 0deg 45deg,
-#003b22 45deg 90deg,
-#00ff88 90deg 135deg,
-#003b22 135deg 180deg,
-#00ff88 180deg 225deg,
-#003b22 225deg 270deg,
-#00ff88 270deg 315deg,
-#003b22 315deg 360deg
-);
-
-border:8px solid #00ff88;
-
-transition:transform 5s cubic-bezier(.17,.67,.12,.99);
-
+.pointer{
+    position:absolute;
+    top:-15px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;
+    height:0;
+    border-left:25px solid transparent;
+    border-right:25px solid transparent;
+    border-top:60px solid #ffd700;
+    filter:drop-shadow(0 0 10px gold);
+    z-index:5;
 }
 
 
 button{
-
-background:#00ff88;
-border:0;
-padding:20px 60px;
-border-radius:40px;
-font-size:22px;
-
+    margin-top:50px;
+    width:260px;
+    height:65px;
+    border:none;
+    border-radius:40px;
+    font-size:32px;
+    font-weight:bold;
+    color:white;
+    background:linear-gradient(90deg,#ff0066,#ff9900);
+    box-shadow:
+    0 0 20px #ff0066,
+    0 0 40px orange;
+    cursor:pointer;
 }
 
+button:active{
+    transform:scale(.95);
+}
 
 #result{
-
-margin-top:30px;
-font-size:30px;
-
+    margin-top:20px;
+    color:white;
+    font-size:25px;
 }
-
 </style>
 
 </head>
@@ -68,16 +80,16 @@ font-size:30px;
 <body>
 
 
-<h1>🟢 心诚则灵 🟢</h1>
+<div class="wheel-box">
+
+<div class="pointer"></div>
+
+<canvas id="wheel" width="360" height="360"></canvas>
+
+</div>
 
 
-<div id="wheel"></div>
-
-
-<button onclick="spin()">
-开始转盘
-</button>
-
+<button onclick="spin()">心诚则灵</button>
 
 <div id="result"></div>
 
@@ -85,65 +97,159 @@ font-size:30px;
 
 <script>
 
+const canvas=document.getElementById("wheel");
+const ctx=canvas.getContext("2d");
 
-function spin(){
+const numbers=["1","2","3","4","5","6","7","8","9"];
 
-
-let r=Math.floor(Math.random()*8)+1;
-
-
-let deg=1440+Math.random()*360;
-
-
-document.getElementById("wheel").style.transform=
-"rotate("+deg+"deg)";
-
-
-
-setTimeout(()=>{
-
-
-document.getElementById("result").innerHTML=
-"✨ 心诚结果："+r+" ✨";
+const colors=[
+"#ff1744",
+"#ff9100",
+"#ffee00",
+"#00e676",
+"#00b0ff",
+"#651fff",
+"#d500f9",
+"#ff4081",
+"#ff1744"
+];
 
 
+let angle=0;
+let spinning=false;
 
-// 写入Supabase
 
-fetch(
-"https://bnthccgpdtxrehunvtbg.supabase.co/rest/v1/%E8%BD%A6%E8%BD%AE%E7%BB%93%E6%9E%9C",
-{
+function draw(){
 
-method:"POST",
+let r=180;
+let part=Math.PI*2/numbers.length;
 
-headers:{
 
-"apikey":"sb_publishable_PcqKnL7U0klVW4LUmSNTrw_HxZ3KCgL",
+ctx.clearRect(0,0,360,360);
 
-"Authorization":"Bearer sb_publishable_PcqKnL7U0klVW4LUmSNTrw_HxZ3KCgL",
+for(let i=0;i<numbers.length;i++){
 
-"Content-Type":"application/json"
+ctx.beginPath();
 
-},
+ctx.moveTo(180,180);
 
-body:JSON.stringify({
+ctx.fillStyle=colors[i];
 
-结果:"数字 "+r
+ctx.arc(
+180,
+180,
+r,
+i*part+angle,
+(i+1)*part+angle
+);
 
-})
+ctx.fill();
 
-}
 
+
+ctx.save();
+
+ctx.translate(180,180);
+
+ctx.rotate(
+i*part+part/2+angle
 );
 
 
+ctx.fillStyle="white";
+ctx.font="bold 35px Arial";
+ctx.shadowColor="black";
+ctx.shadowBlur=8;
 
-},5000);
+ctx.textAlign="center";
 
+ctx.fillText(
+numbers[i],
+120,
+10
+);
 
+ctx.restore();
 
 }
 
+
+//中心
+
+ctx.beginPath();
+
+ctx.arc(180,180,45,0,Math.PI*2);
+
+ctx.fillStyle="#ffb300";
+ctx.fill();
+
+ctx.strokeStyle="white";
+ctx.lineWidth=6;
+ctx.stroke();
+
+
+ctx.fillStyle="white";
+ctx.font="bold 18px Microsoft YaHei";
+ctx.textAlign="center";
+
+ctx.fillText(
+"心诚则灵",
+180,
+186
+);
+
+}
+
+
+
+draw();
+
+
+
+function spin(){
+
+if(spinning)return;
+
+spinning=true;
+
+let speed=Math.random()*0.3+0.25;
+
+let total=0;
+
+let timer=setInterval(()=>{
+
+angle+=speed;
+
+speed*=0.985;
+
+draw();
+
+total+=speed;
+
+
+if(speed<0.002){
+
+clearInterval(timer);
+
+spinning=false;
+
+let deg=
+((Math.PI*2-angle%(Math.PI*2))
+/
+(Math.PI*2)
+*
+9);
+
+let index=Math.floor(deg);
+
+document.getElementById("result").innerHTML=
+"🎉 幸运数字："+numbers[index];
+
+}
+
+},20);
+
+}
 
 </script>
 
