@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>心诚则灵 · 实时记录</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background: #080808;
+    color: white;
+    font-family: "Microsoft YaHei", Arial, sans-serif;
+}
+
+h1 {
+    text-align: center;
+    color: #ffd700;
+    margin-bottom: 10px;
+}
+
+.status {
+    text-align: center;
+    color: #00e676;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    max-width: 900px;
+    margin: auto;
+    border-collapse: collapse;
+    background: #151515;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+th {
+    background: linear-gradient(90deg, #6a00ff, #c000ff);
+    padding: 14px;
+    font-size: 18px;
+}
+
+td {
+    padding: 13px;
+    text-align: center;
+    border-bottom: 1px solid #333;
+    font-size: 17px;
+}
+
+.result {
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.empty {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+}
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
+
+    th,
+    td {
+        padding: 10px 5px;
+        font-size: 14px;
+    }
+
+    .result {
+        font-size: 18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎡 心诚则灵 · 实时记录</h1>
+
+<div class="status" id="status">
+    🟢 正在连接...
+</div>
+
+<table>
+
+<thead>
+<tr>
+    <th>时间</th>
+    <th>用户ID</th>
+    <th>幸运数字</th>
+</tr>
+</thead>
+
+<tbody id="records">
+<tr>
+    <td colspan="3" class="empty">
+        正在加载记录...
+    </td>
+</tr>
+</tbody>
+
+</table>
+
+
+<script>
+
+/* =========================
+   Supabase 配置
+   ========================= */
+
+const SUPABASE_URL =
+    "https://bnthccgpdtxrehunvtbg.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_PcqKnL7U0klVW4LUmSNTrw_HxZ3KCgL";
+
+
+/* =========================
+   获取记录
+   ========================= */
+
+async function loadRecords() {
+
+    try {
+
+        const response = await fetch(
+            SUPABASE_URL +
+            "/rest/v1/wheel_results" +
+            "?select=created_at,result,user_name" +
+            "&order=created_at.desc" +
+            "&limit=100",
+            {
+                method: "GET",
+
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization":
+                        "Bearer " + SUPABASE_KEY
+                }
+            }
+        );
+
+
+        if (!response.ok) {
+
+            const error =
+                await response.text();
+
+            throw new Error(error);
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const records =
+            document.getElementById("records");
+
+
+        if (data.length === 0) {
+
+            records.innerHTML = `
+                <tr>
+                    <td colspan="3"
+                        class="empty">
+                        暂时还没有转盘记录
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        records.innerHTML = "";
+
+
+        data.forEach(item => {
+
+            const tr =
+                document.createElement("tr");
+
+
+            const time =
+                new Date(
+                    item.created_at
+                ).toLocaleString(
+                    "zh-CN",
+                    {
+                        hour12: false
+                    }
+                );
+
+
+            tr.innerHTML = `
+                <td>${time}</td>
+
+                <td>
+                    ${escapeHtml(
+                        item.user_name || "-"
+                    )}
+                </td>
+
+                <td class="result">
+                    ${escapeHtml(
+                        String(item.result)
+                    )}
+                </td>
+            `;
+
+
+            records.appendChild(tr);
+
+        });
+
+
+        document.getElementById(
+            "status"
+        ).innerHTML =
+            "🟢 已连接 · 每1秒自动更新";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById(
+            "status"
+        ).innerHTML =
+            "🔴 连接失败，请检查 Supabase 设置";
+
+    }
+
+}
+
+
+/* =========================
+   防止特殊字符造成页面问题
+   ========================= */
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+}
+
+
+/* =========================
+   第一次立即加载
+   ========================= */
+
+loadRecords();
+
+
+/* =========================
+   每1秒刷新一次
+   ========================= */
+
+setInterval(
+    loadRecords,
+    1000
+);
+
+</script>
+
+</body>
+</html>
