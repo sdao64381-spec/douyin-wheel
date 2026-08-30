@@ -77,8 +77,15 @@ button:disabled{
     cursor:not-allowed;
 }
 
+#userInfo{
+    margin-top:15px;
+    color:#ffd700;
+    font-size:16px;
+    text-align:center;
+}
+
 #result{
-    margin-top:20px;
+    margin-top:12px;
     color:white;
     font-size:25px;
     min-height:35px;
@@ -96,7 +103,10 @@ button:disabled{
 
 <button id="spinButton" onclick="spin()">心诚则灵</button>
 
+<div id="userInfo"></div>
+
 <div id="result"></div>
+
 
 <script>
 
@@ -112,19 +122,99 @@ const SUPABASE_KEY =
 
 
 /* =========================
-   转盘配置
+   自动生成用户编号
    ========================= */
 
-const canvas = document.getElementById("wheel");
-const ctx = canvas.getContext("2d");
+/*
+   第一次打开网页：
+   自动生成一个用户编号。
+
+   例如：
+   用户A7K2M9
+
+   之后再次打开这个网页，
+   只要浏览器没有清除网站数据，
+   还是同一个编号。
+*/
+
+function generateUserId(){
+
+    const chars =
+        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+    let result = "";
+
+    for(let i = 0; i < 6; i++){
+
+        result +=
+            chars.charAt(
+                Math.floor(
+                    Math.random() * chars.length
+                )
+            );
+
+    }
+
+    return "用户" + result;
+}
 
 
 /*
-   你的转盘是 1～8
+   从浏览器本地保存的记录中读取用户编号
+*/
+
+let userId =
+    localStorage.getItem("wheel_user_id");
+
+
+/*
+   如果第一次访问，就生成新的编号
+*/
+
+if(!userId){
+
+    userId = generateUserId();
+
+    localStorage.setItem(
+        "wheel_user_id",
+        userId
+    );
+
+}
+
+
+/*
+   页面显示用户编号
+*/
+
+document.getElementById("userInfo").innerHTML =
+    "你的用户编号：" + userId;
+
+
+/* =========================
+   转盘配置
+   ========================= */
+
+const canvas =
+    document.getElementById("wheel");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+/*
+   转盘是 1～8
 */
 
 const numbers = [
-    "1","2","3","4","5","6","7","8"
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
 ];
 
 
@@ -141,6 +231,7 @@ const colors = [
 
 
 let angle = 0;
+
 let spinning = false;
 
 
@@ -151,18 +242,35 @@ let spinning = false;
 function draw(){
 
     const r = 180;
-    const part = Math.PI * 2 / numbers.length;
 
-    ctx.clearRect(0,0,360,360);
+    const part =
+        Math.PI * 2 / numbers.length;
 
 
-    for(let i=0;i<numbers.length;i++){
+    ctx.clearRect(
+        0,
+        0,
+        360,
+        360
+    );
+
+
+    for(
+        let i = 0;
+        i < numbers.length;
+        i++
+    ){
 
         ctx.beginPath();
 
-        ctx.moveTo(180,180);
+        ctx.moveTo(
+            180,
+            180
+        );
 
-        ctx.fillStyle = colors[i];
+        ctx.fillStyle =
+            colors[i];
+
 
         ctx.arc(
             180,
@@ -172,6 +280,7 @@ function draw(){
             (i + 1) * part + angle
         );
 
+
         ctx.fill();
 
 
@@ -179,17 +288,33 @@ function draw(){
 
         ctx.save();
 
-        ctx.translate(180,180);
-
-        ctx.rotate(
-            i * part + part / 2 + angle
+        ctx.translate(
+            180,
+            180
         );
 
-        ctx.fillStyle = "white";
-        ctx.font = "bold 35px Arial";
-        ctx.shadowColor = "black";
-        ctx.shadowBlur = 8;
-        ctx.textAlign = "center";
+        ctx.rotate(
+            i * part +
+            part / 2 +
+            angle
+        );
+
+
+        ctx.fillStyle =
+            "white";
+
+        ctx.font =
+            "bold 35px Arial";
+
+        ctx.shadowColor =
+            "black";
+
+        ctx.shadowBlur =
+            8;
+
+        ctx.textAlign =
+            "center";
+
 
         ctx.fillText(
             numbers[i],
@@ -197,11 +322,15 @@ function draw(){
             10
         );
 
+
         ctx.restore();
+
     }
 
 
-    /* 中心圆 */
+    /* =========================
+       中心圆
+       ========================= */
 
     ctx.beginPath();
 
@@ -213,22 +342,38 @@ function draw(){
         Math.PI * 2
     );
 
-    ctx.fillStyle = "#ffb300";
+
+    ctx.fillStyle =
+        "#ffb300";
+
     ctx.fill();
 
-    ctx.strokeStyle = "white";
-    ctx.lineWidth = 6;
+
+    ctx.strokeStyle =
+        "white";
+
+    ctx.lineWidth =
+        6;
+
     ctx.stroke();
 
-    ctx.fillStyle = "white";
-    ctx.font = "bold 18px Microsoft YaHei";
-    ctx.textAlign = "center";
+
+    ctx.fillStyle =
+        "white";
+
+    ctx.font =
+        "bold 18px Microsoft YaHei";
+
+    ctx.textAlign =
+        "center";
+
 
     ctx.fillText(
         "心诚则灵",
         180,
         186
     );
+
 }
 
 
@@ -243,33 +388,55 @@ async function saveResult(number){
 
     try{
 
-        const response = await fetch(
-            SUPABASE_URL + "/rest/v1/wheel_results",
-            {
-                method:"POST",
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/wheel_results",
+                {
 
-                headers:{
-                    "Content-Type":"application/json",
-                    "apikey":SUPABASE_KEY,
-                    "Authorization":"Bearer " + SUPABASE_KEY,
-                    "Prefer":"return=minimal"
-                },
+                    method:"POST",
 
-                /*
-                   注意：
-                   Supabase 表里的字段叫 result
-                */
+                    headers:{
+                        "Content-Type":
+                            "application/json",
 
-                body:JSON.stringify({
-                    result:number
-                })
-            }
-        );
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY,
+
+                        "Prefer":
+                            "return=minimal"
+                    },
+
+
+                    /*
+                       同时保存：
+
+                       result = 转出的数字
+
+                       user_name = 用户编号
+                    */
+
+                    body:JSON.stringify({
+
+                        result:number,
+
+                        user_name:userId
+
+                    })
+
+                }
+            );
 
 
         if(!response.ok){
 
-            const errorText = await response.text();
+            const errorText =
+                await response.text();
+
 
             console.error(
                 "Supabase 写入失败：",
@@ -277,14 +444,20 @@ async function saveResult(number){
                 errorText
             );
 
+
             return false;
+
         }
 
 
         console.log(
-            "✅ 已成功写入 Supabase：",
-            number
+            "✅ 已成功写入 Supabase",
+            {
+                用户:userId,
+                结果:number
+            }
         );
+
 
         return true;
 
@@ -296,8 +469,11 @@ async function saveResult(number){
             error
         );
 
+
         return false;
+
     }
+
 }
 
 
@@ -308,48 +484,67 @@ async function saveResult(number){
 function spin(){
 
     if(spinning){
+
         return;
+
     }
 
 
     spinning = true;
 
-    document.getElementById("spinButton").disabled = true;
 
-    document.getElementById("result").innerHTML =
+    document.getElementById(
+        "spinButton"
+    ).disabled = true;
+
+
+    document.getElementById(
+        "result"
+    ).innerHTML =
         "✨ 转盘进行中...";
 
 
     /*
-      随机决定最终结果
+       随机决定最终结果
     */
 
     const resultIndex =
-        Math.floor(Math.random() * numbers.length);
+        Math.floor(
+            Math.random() *
+            numbers.length
+        );
+
 
     const resultNumber =
         numbers[resultIndex];
 
 
     /*
-      每一格的角度
+       每一格的角度
     */
 
     const part =
-        Math.PI * 2 / numbers.length;
+        Math.PI * 2 /
+        numbers.length;
 
 
     /*
-      把目标数字转到正上方
+       把目标数字转到正上方
     */
 
     const targetAngle =
         -Math.PI / 2
-        - (resultIndex * part + part / 2);
+        -
+        (
+            resultIndex * part
+            +
+            part / 2
+        );
 
 
     const current =
-        angle % (Math.PI * 2);
+        angle %
+        (Math.PI * 2);
 
 
     let finalAngle =
@@ -357,22 +552,33 @@ function spin(){
 
 
     /*
-      至少旋转 6 圈
+       至少旋转 6 圈
     */
 
-    while(finalAngle < current + Math.PI * 2 * 6){
+    while(
+        finalAngle <
+        current +
+        Math.PI * 2 * 6
+    ){
 
-        finalAngle += Math.PI * 2;
+        finalAngle +=
+            Math.PI * 2;
 
     }
 
 
-    const startAngle = angle;
+    const startAngle =
+        angle;
+
 
     const distance =
-        finalAngle - startAngle;
+        finalAngle -
+        startAngle;
 
-    const duration = 5000;
+
+    const duration =
+        5000;
+
 
     const startTime =
         performance.now();
@@ -381,23 +587,34 @@ function spin(){
     function animate(now){
 
         const elapsed =
-            now - startTime;
+            now -
+            startTime;
 
 
         let progress =
-            Math.min(elapsed / duration,1);
+            Math.min(
+                elapsed /
+                duration,
+                1
+            );
 
 
         /*
-          缓出效果
+           缓出效果
         */
 
         const eased =
-            1 - Math.pow(1 - progress,4);
+            1 -
+            Math.pow(
+                1 - progress,
+                4
+            );
 
 
         angle =
-            startAngle + distance * eased;
+            startAngle +
+            distance *
+            eased;
 
 
         draw();
@@ -405,35 +622,57 @@ function spin(){
 
         if(progress < 1){
 
-            requestAnimationFrame(animate);
+            requestAnimationFrame(
+                animate
+            );
+
 
         }else{
 
-            angle = finalAngle;
+            angle =
+                finalAngle;
+
 
             draw();
 
 
-            spinning = false;
+            spinning =
+                false;
 
-            document.getElementById("spinButton").disabled = false;
+
+            document.getElementById(
+                "spinButton"
+            ).disabled = false;
 
 
-            document.getElementById("result").innerHTML =
-                "🎉 幸运数字：" + resultNumber;
+            document.getElementById(
+                "result"
+            ).innerHTML =
+                "🎉 幸运数字：" +
+                resultNumber;
 
 
             /*
-              转盘结束后写入 Supabase
+               转盘结束后保存：
+
+               用户编号
+               +
+               幸运数字
             */
 
-            saveResult(resultNumber);
+            saveResult(
+                resultNumber
+            );
 
         }
+
     }
 
 
-    requestAnimationFrame(animate);
+    requestAnimationFrame(
+        animate
+    );
+
 }
 
 </script>
