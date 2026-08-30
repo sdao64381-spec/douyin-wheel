@@ -1,85 +1,1209 @@
-function spin(){
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    if(spinning){
+<title>心诚则灵转盘</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100%;
+}
+
+body{
+
+    min-height:100vh;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #252525 0%,
+            #101010 45%,
+            #000000 100%
+        );
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-family:
+        "Microsoft YaHei",
+        Arial,
+        sans-serif;
+
+    overflow:hidden;
+
+    color:white;
+}
+
+
+/* =========================
+   整体容器
+========================= */
+
+.container{
+
+    width:100%;
+
+    max-width:520px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:20px;
+}
+
+
+/* =========================
+   转盘区域
+========================= */
+
+.wheel-box{
+
+    position:relative;
+
+    width:360px;
+
+    height:360px;
+
+    flex-shrink:0;
+}
+
+
+/* =========================
+   转盘
+========================= */
+
+canvas{
+
+    display:block;
+
+    width:360px;
+
+    height:360px;
+
+    border-radius:50%;
+
+    box-shadow:
+
+        0 0 15px #ffffff,
+
+        0 0 35px #ffd700,
+
+        0 0 70px rgba(255,215,0,0.7);
+}
+
+
+/* =========================
+   指针
+========================= */
+
+.pointer{
+
+    position:absolute;
+
+    top:-25px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:0;
+
+    height:0;
+
+    border-left:28px solid transparent;
+
+    border-right:28px solid transparent;
+
+    border-top:65px solid #ffd700;
+
+    filter:
+        drop-shadow(0 0 6px #fff)
+        drop-shadow(0 0 15px #ffd700);
+
+    z-index:10;
+}
+
+
+/* =========================
+   用户区域
+========================= */
+
+.user-area{
+
+    width:100%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    margin-top:35px;
+}
+
+
+/* =========================
+   提示文字
+========================= */
+
+#userTitle{
+
+    color:#ffffff;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    margin-bottom:12px;
+
+    text-align:center;
+
+    text-shadow:
+        0 0 8px rgba(255,255,255,0.7);
+}
+
+
+/* =========================
+   ID 输入框
+========================= */
+
+#userInput{
+
+    width:300px;
+
+    height:58px;
+
+    border-radius:35px;
+
+    border:3px solid #ffd700;
+
+    outline:none;
+
+    background:#444;
+
+    color:white;
+
+    text-align:center;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    box-shadow:
+
+        0 0 12px rgba(255,215,0,0.7),
+
+        inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+
+#userInput::placeholder{
+
+    color:#cccccc;
+
+}
+
+
+/* 输入框获得焦点 */
+
+#userInput:focus{
+
+    border-color:#fff;
+
+    box-shadow:
+
+        0 0 20px #ffd700,
+
+        0 0 40px rgba(255,215,0,0.5);
+}
+
+
+/* =========================
+   确认ID按钮
+========================= */
+
+#confirmButton{
+
+    margin-top:15px;
+
+    width:280px;
+
+    height:58px;
+
+    border:none;
+
+    border-radius:35px;
+
+    font-size:25px;
+
+    font-weight:bold;
+
+    color:white;
+
+    background:
+        linear-gradient(
+            90deg,
+            #5420d6,
+            #b000c9
+        );
+
+    box-shadow:
+
+        0 0 15px #8e2cff,
+
+        0 0 30px rgba(174,0,255,0.6);
+
+    cursor:pointer;
+}
+
+
+#confirmButton:active{
+
+    transform:scale(0.96);
+}
+
+
+/* =========================
+   ID确认后的提示
+========================= */
+
+#userInfo{
+
+    margin-top:12px;
+
+    min-height:25px;
+
+    color:#ffd700;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    text-align:center;
+}
+
+
+/* =========================
+   转盘按钮
+========================= */
+
+#spinButton{
+
+    margin-top:18px;
+
+    width:280px;
+
+    height:65px;
+
+    border:none;
+
+    border-radius:40px;
+
+    font-size:30px;
+
+    font-weight:bold;
+
+    color:white;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ff0066,
+            #ff9900
+        );
+
+    box-shadow:
+
+        0 0 20px #ff0066,
+
+        0 0 40px orange;
+
+    cursor:pointer;
+
+    transition:0.15s;
+}
+
+
+#spinButton:active{
+
+    transform:scale(0.95);
+}
+
+
+#spinButton:disabled{
+
+    opacity:0.5;
+
+    cursor:not-allowed;
+
+    box-shadow:none;
+}
+
+
+/* =========================
+   结果
+========================= */
+
+#result{
+
+    margin-top:15px;
+
+    color:white;
+
+    font-size:25px;
+
+    font-weight:bold;
+
+    min-height:35px;
+
+    text-align:center;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,0.8);
+}
+
+
+/* =========================
+   手机适配
+========================= */
+
+@media(max-width:600px){
+
+    .wheel-box{
+
+        width:300px;
+
+        height:300px;
+    }
+
+    canvas{
+
+        width:300px;
+
+        height:300px;
+    }
+
+    .pointer{
+
+        top:-22px;
+
+        border-left-width:23px;
+
+        border-right-width:23px;
+
+        border-top-width:55px;
+    }
+
+    #userTitle{
+
+        font-size:21px;
+    }
+
+    #userInput{
+
+        width:280px;
+
+        height:54px;
+
+        font-size:22px;
+    }
+
+    #confirmButton{
+
+        width:260px;
+
+        height:54px;
+
+        font-size:23px;
+    }
+
+    #spinButton{
+
+        width:260px;
+
+        height:60px;
+
+        font-size:28px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =====================
+         转盘
+    ====================== -->
+
+    <div class="wheel-box">
+
+        <div class="pointer"></div>
+
+        <canvas
+            id="wheel"
+            width="360"
+            height="360">
+        </canvas>
+
+    </div>
+
+
+    <!-- =====================
+         用户ID区域
+    ====================== -->
+
+    <div class="user-area">
+
+
+        <div id="userTitle">
+            请输入你的用户ID
+        </div>
+
+
+        <input
+            id="userInput"
+            type="text"
+            maxlength="50"
+            placeholder="请输入ID"
+            autocomplete="off"
+        >
+
+
+        <button
+            id="confirmButton"
+            onclick="confirmUser()">
+            确认ID
+        </button>
+
+
+        <div id="userInfo"></div>
+
+
+        <!-- =====================
+             转盘按钮
+        ====================== -->
+
+        <button
+            id="spinButton"
+            onclick="spin()"
+            disabled>
+            请先确认ID
+        </button>
+
+
+        <div id="result"></div>
+
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+
+/* =========================================================
+   Supabase 配置
+========================================================= */
+
+const SUPABASE_URL =
+    "https://bnthccgpdtxrehunvtbg.supabase.co";
+
+
+const SUPABASE_KEY =
+    "sb_publishable_PcqKnL7U0klVW4LUmSNTrw_HxZ3KCgL";
+
+
+/* =========================================================
+   用户信息
+========================================================= */
+
+let userId = "";
+
+let userConfirmed = false;
+
+
+/* =========================================================
+   用户确认
+========================================================= */
+
+function confirmUser(){
+
+    const input =
+        document
+        .getElementById("userInput");
+
+    const value =
+        input.value.trim();
+
+
+    /* 不允许空ID */
+
+    if(!value){
+
+        alert("请输入你的用户ID");
+
+        input.focus();
+
         return;
     }
 
+
+    userId = value;
+
+    userConfirmed = true;
+
+
+    document
+    .getElementById("userInfo")
+    .innerHTML =
+        "✅ ID已确认：" + userId;
+
+
+    const spinButton =
+        document.getElementById(
+            "spinButton"
+        );
+
+
+    spinButton.disabled = false;
+
+    spinButton.innerHTML =
+        "心诚则灵";
+
+
+    document
+    .getElementById("result")
+    .innerHTML =
+        "可以开始转盘了";
+
+
+    /* 输入框确认后锁定 */
+
+    input.disabled = true;
+
+}
+
+
+/* =========================================================
+   回车也可以确认ID
+========================================================= */
+
+document
+.getElementById("userInput")
+.addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key === "Enter"){
+
+            confirmUser();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   转盘
+========================================================= */
+
+const canvas =
+    document.getElementById("wheel");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+/* 8个数字 */
+
+const numbers = [
+
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+
+];
+
+
+/* 颜色 */
+
+const colors = [
+
+    "#ff1744",
+
+    "#ff9100",
+
+    "#ffee00",
+
+    "#00e676",
+
+    "#00b0ff",
+
+    "#651fff",
+
+    "#d500f9",
+
+    "#ff4081"
+
+];
+
+
+/* 当前转盘角度 */
+
+let angle = 0;
+
+
+/* 是否正在转 */
+
+let spinning = false;
+
+
+/* =========================================================
+   画转盘
+========================================================= */
+
+function draw(){
+
+    const center = 180;
+
+    const radius = 180;
+
+    const count =
+        numbers.length;
+
+    const part =
+        Math.PI * 2 / count;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        360,
+        360
+    );
+
+
+    /* =====================
+       画8个区域
+    ===================== */
+
+    for(
+        let i = 0;
+        i < count;
+        i++
+    ){
+
+        const startAngle =
+            i * part + angle;
+
+
+        const endAngle =
+            (i + 1) * part + angle;
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            center,
+            center
+        );
+
+
+        ctx.arc(
+            center,
+            center,
+            radius,
+            startAngle,
+            endAngle
+        );
+
+
+        ctx.closePath();
+
+
+        ctx.fillStyle =
+            colors[i];
+
+
+        ctx.fill();
+
+
+        /* =====================
+           数字
+        ===================== */
+
+        const middleAngle =
+            startAngle +
+            part / 2;
+
+
+        const textRadius =
+            120;
+
+
+        const textX =
+            center +
+            Math.cos(middleAngle)
+            * textRadius;
+
+
+        const textY =
+            center +
+            Math.sin(middleAngle)
+            * textRadius;
+
+
+        ctx.save();
+
+
+        ctx.translate(
+            textX,
+            textY
+        );
+
+
+        /*
+           数字始终保持正向
+        */
+
+        let textRotation =
+            middleAngle +
+            Math.PI / 2;
+
+
+        /*
+           如果数字朝下，
+           自动翻转180度
+        */
+
+        if(
+            textRotation >
+            Math.PI / 2 &&
+            textRotation <
+            Math.PI * 1.5
+        ){
+
+            textRotation += Math.PI;
+
+        }
+
+
+        ctx.rotate(
+            textRotation
+        );
+
+
+        ctx.fillStyle =
+            "white";
+
+
+        ctx.font =
+            "bold 36px Arial";
+
+
+        ctx.textAlign =
+            "center";
+
+
+        ctx.textBaseline =
+            "middle";
+
+
+        ctx.shadowColor =
+            "rgba(0,0,0,0.8)";
+
+
+        ctx.shadowBlur =
+            8;
+
+
+        ctx.fillText(
+            numbers[i],
+            0,
+            0
+        );
+
+
+        ctx.restore();
+
+    }
+
+
+    /* =====================================================
+       外圈
+    ===================================================== */
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        center,
+        center,
+        177,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.strokeStyle =
+        "#ffffff";
+
+
+    ctx.lineWidth =
+        4;
+
+
+    ctx.stroke();
+
+
+    /* =====================================================
+       中心圆
+    ===================================================== */
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        center,
+        center,
+        46,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.fillStyle =
+        "#ffb300";
+
+
+    ctx.fill();
+
+
+    ctx.strokeStyle =
+        "white";
+
+
+    ctx.lineWidth =
+        6;
+
+
+    ctx.stroke();
+
+
+    /* 中心文字 */
+
+    ctx.fillStyle =
+        "white";
+
+
+    ctx.font =
+        "bold 18px Microsoft YaHei";
+
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.textBaseline =
+        "middle";
+
+
+    ctx.shadowColor =
+        "rgba(0,0,0,0.7)";
+
+
+    ctx.shadowBlur =
+        5;
+
+
+    ctx.fillText(
+        "心诚则灵",
+        center,
+        center
+    );
+
+}
+
+
+/* 第一次画 */
+
+draw();
+
+
+/* =========================================================
+   保存结果到 Supabase
+========================================================= */
+
+async function saveResult(number){
+
+    try{
+
+        const response =
+            await fetch(
+
+                SUPABASE_URL +
+                "/rest/v1/wheel_results",
+
+                {
+
+                    method:"POST",
+
+                    headers:{
+
+                        "Content-Type":
+                            "application/json",
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY,
+
+                        "Prefer":
+                            "return=minimal"
+
+                    },
+
+
+                    body:JSON.stringify({
+
+                        result:number,
+
+                        user_name:userId
+
+                    })
+
+                }
+
+            );
+
+
+        if(!response.ok){
+
+            const errorText =
+                await response.text();
+
+
+            console.error(
+                "Supabase写入失败",
+                response.status,
+                errorText
+            );
+
+
+            return false;
+
+        }
+
+
+        console.log(
+            "✅ 保存成功",
+            userId,
+            number
+        );
+
+
+        return true;
+
+
+    }catch(error){
+
+        console.error(
+            "Supabase请求错误",
+            error
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   开始转盘
+========================================================= */
+
+function spin(){
+
+
+    /* 没有确认ID不能转 */
+
+    if(!userConfirmed){
+
+        alert("请先输入并确认用户ID");
+
+        return;
+
+    }
+
+
+    /* 防止连续点击 */
+
+    if(spinning){
+
+        return;
+
+    }
+
+
     spinning = true;
 
-    document.getElementById("spinButton").disabled = true;
 
-    document.getElementById("result").innerHTML =
+    const button =
+        document.getElementById(
+            "spinButton"
+        );
+
+
+    button.disabled = true;
+
+
+    document
+    .getElementById("result")
+    .innerHTML =
         "✨ 转盘进行中...";
 
 
-    /*
-       随机决定最终结果
-    */
+    /* =====================================================
+       随机决定结果
+    ===================================================== */
 
     const resultIndex =
         Math.floor(
-            Math.random() * numbers.length
+            Math.random() *
+            numbers.length
         );
+
 
     const resultNumber =
         numbers[resultIndex];
 
 
-    /*
+    /* =====================================================
        每一格的角度
-    */
+    ===================================================== */
 
     const part =
-        Math.PI * 2 / numbers.length;
+        Math.PI * 2 /
+        numbers.length;
 
 
-    /*
-       当前角度归一化到 0 ~ 2π
-    */
+    /* =====================================================
+       指针所在位置
 
-    const currentAngle =
-        ((angle % (Math.PI * 2)) + Math.PI * 2)
-        % (Math.PI * 2);
+       正上方 = -PI/2
+    ===================================================== */
+
+    const pointerAngle =
+        -Math.PI / 2;
 
 
-    /*
-       目标数字需要到达正上方
-    */
+    /* =====================================================
+       目标数字中心角度
+
+       这里非常重要：
+       让目标数字中心最终准确落在指针下面
+    ===================================================== */
 
     const targetAngle =
-        -Math.PI / 2
-        -
+        pointerAngle -
         (
-            resultIndex * part
-            +
+            resultIndex * part +
             part / 2
         );
 
 
-    /*
-       计算这一次需要额外转多少角度
+    /* =====================================================
+       当前角度归一化
+    ===================================================== */
 
-       保证：
-       1. 一定向前转
-       2. 不会出现负数
-       3. 每次至少完整转 6 圈
-    */
+    const fullCircle =
+        Math.PI * 2;
+
+
+    const currentAngle =
+        (
+            angle %
+            fullCircle +
+            fullCircle
+        ) %
+        fullCircle;
+
+
+    /* =====================================================
+       计算还需要转多少
+
+       保证顺时针旋转
+       并且至少6圈
+    ===================================================== */
 
     let delta =
-        targetAngle - currentAngle;
+        targetAngle -
+        currentAngle;
 
 
     delta =
-        ((delta % (Math.PI * 2)) + Math.PI * 2)
-        % (Math.PI * 2);
+        (
+            delta %
+            fullCircle +
+            fullCircle
+        ) %
+        fullCircle;
 
 
-    /*
-       至少旋转 6 圈
-    */
+    /* =====================================================
+       固定6圈
+
+       每次都是：
+
+       6圈 + 目标角度
+
+       不会因为连续转而越来越慢
+    ===================================================== */
 
     const totalRotation =
-        delta + Math.PI * 2 * 6;
+        fullCircle * 6 +
+        delta;
 
 
     const startAngle =
@@ -87,42 +1211,47 @@ function spin(){
 
 
     const finalAngle =
-        startAngle + totalRotation;
+        startAngle +
+        totalRotation;
 
 
-    const distance =
-        finalAngle - startAngle;
+    const duration =
+        5000;
 
-
-    /*
-       每次固定 5 秒
-
-       无论第几次转，
-       都保持一样的速度和圈数
-    */
-
-    const duration = 5000;
 
     const startTime =
         performance.now();
 
 
+    /* =====================================================
+       动画
+    ===================================================== */
+
     function animate(now){
 
         const elapsed =
-            now - startTime;
+            now -
+            startTime;
 
 
         let progress =
-            Math.min(
-                elapsed / duration,
-                1
-            );
+            elapsed /
+            duration;
 
 
-        /*
-           缓出效果
-        */
+        if(progress > 1){
+
+            progress = 1;
+
+        }
+
+
+        /* =================================================
+           平滑减速
+
+           前面快
+           后面慢
+        ================================================= */
 
         const eased =
             1 -
@@ -134,11 +1263,19 @@ function spin(){
 
         angle =
             startAngle +
-            distance * eased;
+            (
+                finalAngle -
+                startAngle
+            ) *
+            eased;
 
 
         draw();
 
+
+        /* =================================================
+           继续动画
+        ================================================= */
 
         if(progress < 1){
 
@@ -146,41 +1283,49 @@ function spin(){
                 animate
             );
 
-        }else{
 
-            angle =
-                finalAngle;
-
-            draw();
-
-
-            spinning = false;
-
-            document.getElementById(
-                "spinButton"
-            ).disabled = false;
-
-
-            document.getElementById(
-                "result"
-            ).innerHTML =
-                "🎉 幸运数字：" +
-                resultNumber;
-
-
-            /*
-               保存：
-
-               用户ID
-               +
-               幸运数字
-            */
-
-            saveResult(
-                resultNumber
-            );
+            return;
 
         }
+
+
+        /* =================================================
+           最终位置
+        ================================================= */
+
+        angle =
+            finalAngle;
+
+
+        draw();
+
+
+        spinning = false;
+
+
+        button.disabled = false;
+
+
+        button.innerHTML =
+            "再转一次";
+
+
+        document
+        .getElementById("result")
+        .innerHTML =
+            "🎉 幸运数字：" +
+            resultNumber;
+
+
+        /* =================================================
+           保存到 Supabase
+
+           ID + 数字
+        ================================================= */
+
+        saveResult(
+            resultNumber
+        );
 
     }
 
@@ -188,4 +1333,10 @@ function spin(){
     requestAnimationFrame(
         animate
     );
+
 }
+
+</script>
+
+</body>
+</html>
