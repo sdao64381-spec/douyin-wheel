@@ -52,8 +52,40 @@ canvas{
     z-index:5;
 }
 
+/* =========================
+   用户ID输入框
+   ========================= */
+
+#userInput{
+    margin-top:25px;
+    width:300px;
+    height:50px;
+    border:2px solid #ffd700;
+    border-radius:25px;
+    background:rgba(0,0,0,.65);
+    color:white;
+    text-align:center;
+    font-size:18px;
+    outline:none;
+}
+
+#userInput::placeholder{
+    color:#aaa;
+}
+
+#userInput:focus{
+    box-shadow:
+        0 0 10px gold,
+        0 0 20px orange;
+}
+
+
+/* =========================
+   转盘按钮
+   ========================= */
+
 button{
-    margin-top:50px;
+    margin-top:20px;
     width:260px;
     height:65px;
     border:none;
@@ -77,12 +109,22 @@ button:disabled{
     cursor:not-allowed;
 }
 
+
+/* =========================
+   用户信息
+   ========================= */
+
 #userInfo{
     margin-top:15px;
     color:#ffd700;
     font-size:16px;
     text-align:center;
 }
+
+
+/* =========================
+   结果
+   ========================= */
 
 #result{
     margin-top:12px;
@@ -94,25 +136,68 @@ button:disabled{
 </style>
 </head>
 
+
 <body>
 
+
+<!-- =========================
+     转盘
+     ========================= -->
+
 <div class="wheel-box">
+
     <div class="pointer"></div>
-    <canvas id="wheel" width="360" height="360"></canvas>
+
+    <canvas
+        id="wheel"
+        width="360"
+        height="360">
+    </canvas>
+
 </div>
 
-<button id="spinButton" onclick="spin()">心诚则灵</button>
+
+<!-- =========================
+     用户输入自己的ID
+     ========================= -->
+
+<input
+    id="userInput"
+    type="text"
+    maxlength="50"
+    placeholder="请输入你的用户ID">
+
+
+<!-- =========================
+     转盘按钮
+     ========================= -->
+
+<button
+    id="spinButton"
+    onclick="spin()">
+
+    心诚则灵
+
+</button>
+
+
+<!-- 用户信息 -->
 
 <div id="userInfo"></div>
+
+
+<!-- 转盘结果 -->
 
 <div id="result"></div>
 
 
+
 <script>
 
-/* =========================
+
+/* =====================================================
    Supabase 配置
-   ========================= */
+   ===================================================== */
 
 const SUPABASE_URL =
     "https://bnthccgpdtxrehunvtbg.supabase.co";
@@ -121,79 +206,51 @@ const SUPABASE_KEY =
     "sb_publishable_PcqKnL7U0klVW4LUmSNTrw_HxZ3KCgL";
 
 
-/* =========================
-   自动生成用户编号
-   ========================= */
 
-/*
-   第一次打开网页：
-   自动生成一个用户编号。
+/* =====================================================
+   获取页面元素
+   ===================================================== */
 
-   例如：
-   用户A7K2M9
+const userInput =
+    document.getElementById("userInput");
 
-   之后再次打开这个网页，
-   只要浏览器没有清除网站数据，
-   还是同一个编号。
-*/
+const userInfo =
+    document.getElementById("userInfo");
 
-function generateUserId(){
+const resultText =
+    document.getElementById("result");
 
-    const chars =
-        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
-    let result = "";
-
-    for(let i = 0; i < 6; i++){
-
-        result +=
-            chars.charAt(
-                Math.floor(
-                    Math.random() * chars.length
-                )
-            );
-
-    }
-
-    return "用户" + result;
-}
+const spinButton =
+    document.getElementById("spinButton");
 
 
-/*
-   从浏览器本地保存的记录中读取用户编号
-*/
 
-let userId =
+/* =====================================================
+   读取上一次输入的用户ID
+   =====================================================
+
+   如果观众之前输入过ID，
+   浏览器会记住。
+
+   下次再打开网页时自动填回来。
+
+   如果不想记住，也可以删除这部分。
+   ===================================================== */
+
+const savedUserId =
     localStorage.getItem("wheel_user_id");
 
+if(savedUserId){
 
-/*
-   如果第一次访问，就生成新的编号
-*/
-
-if(!userId){
-
-    userId = generateUserId();
-
-    localStorage.setItem(
-        "wheel_user_id",
-        userId
-    );
+    userInput.value = savedUserId;
 
 }
 
 
-/*
-   页面显示用户编号
-*/
 
-document.getElementById("userInfo").innerHTML =
-    "你的用户编号：" + userId;
-
-
-/* =========================
+/* =====================================================
    转盘配置
-   ========================= */
+   ===================================================== */
 
 const canvas =
     document.getElementById("wheel");
@@ -201,10 +258,6 @@ const canvas =
 const ctx =
     canvas.getContext("2d");
 
-
-/*
-   转盘是 1～8
-*/
 
 const numbers = [
     "1",
@@ -235,9 +288,10 @@ let angle = 0;
 let spinning = false;
 
 
-/* =========================
+
+/* =====================================================
    画转盘
-   ========================= */
+   ===================================================== */
 
 function draw(){
 
@@ -268,6 +322,7 @@ function draw(){
             180
         );
 
+
         ctx.fillStyle =
             colors[i];
 
@@ -284,14 +339,18 @@ function draw(){
         ctx.fill();
 
 
-        /* 数字 */
+        /* =========================
+           数字
+           ========================= */
 
         ctx.save();
+
 
         ctx.translate(
             180,
             180
         );
+
 
         ctx.rotate(
             i * part +
@@ -303,14 +362,18 @@ function draw(){
         ctx.fillStyle =
             "white";
 
+
         ctx.font =
             "bold 35px Arial";
+
 
         ctx.shadowColor =
             "black";
 
+
         ctx.shadowBlur =
             8;
+
 
         ctx.textAlign =
             "center";
@@ -328,11 +391,13 @@ function draw(){
     }
 
 
+
     /* =========================
        中心圆
        ========================= */
 
     ctx.beginPath();
+
 
     ctx.arc(
         180,
@@ -346,14 +411,17 @@ function draw(){
     ctx.fillStyle =
         "#ffb300";
 
+
     ctx.fill();
 
 
     ctx.strokeStyle =
         "white";
 
+
     ctx.lineWidth =
         6;
+
 
     ctx.stroke();
 
@@ -361,8 +429,10 @@ function draw(){
     ctx.fillStyle =
         "white";
 
+
     ctx.font =
         "bold 18px Microsoft YaHei";
+
 
     ctx.textAlign =
         "center";
@@ -380,11 +450,15 @@ function draw(){
 draw();
 
 
-/* =========================
-   写入 Supabase
-   ========================= */
 
-async function saveResult(number){
+/* =====================================================
+   保存转盘结果到 Supabase
+   ===================================================== */
+
+async function saveResult(
+    number,
+    userId
+){
 
     try{
 
@@ -397,6 +471,7 @@ async function saveResult(number){
                     method:"POST",
 
                     headers:{
+
                         "Content-Type":
                             "application/json",
 
@@ -409,16 +484,17 @@ async function saveResult(number){
 
                         "Prefer":
                             "return=minimal"
+
                     },
 
 
-                    /*
-                       同时保存：
+                    /* =========================
+                       保存：
 
-                       result = 转出的数字
+                       result = 转盘结果
 
-                       user_name = 用户编号
-                    */
+                       user_name = 用户输入的ID
+                       ========================= */
 
                     body:JSON.stringify({
 
@@ -432,6 +508,7 @@ async function saveResult(number){
             );
 
 
+
         if(!response.ok){
 
             const errorText =
@@ -439,7 +516,7 @@ async function saveResult(number){
 
 
             console.error(
-                "Supabase 写入失败：",
+                "Supabase写入失败：",
                 response.status,
                 errorText
             );
@@ -451,10 +528,10 @@ async function saveResult(number){
 
 
         console.log(
-            "✅ 已成功写入 Supabase",
+            "✅ 保存成功",
             {
-                用户:userId,
-                结果:number
+                用户ID:userId,
+                转盘结果:number
             }
         );
 
@@ -465,7 +542,7 @@ async function saveResult(number){
     }catch(error){
 
         console.error(
-            "Supabase 请求错误：",
+            "Supabase请求错误：",
             error
         );
 
@@ -477,11 +554,40 @@ async function saveResult(number){
 }
 
 
-/* =========================
+
+/* =====================================================
    开始转盘
-   ========================= */
+   ===================================================== */
 
 function spin(){
+
+
+    /* =========================
+       获取用户输入的ID
+       ========================= */
+
+    const userId =
+        userInput.value.trim();
+
+
+    /* =========================
+       没输入ID，不允许转
+       ========================= */
+
+    if(!userId){
+
+        alert("请先输入你的用户ID！");
+
+        userInput.focus();
+
+        return;
+
+    }
+
+
+    /* =========================
+       正在转，禁止重复点击
+       ========================= */
 
     if(spinning){
 
@@ -490,23 +596,41 @@ function spin(){
     }
 
 
+    /* =========================
+       保存用户ID到浏览器
+       ========================= */
+
+    localStorage.setItem(
+        "wheel_user_id",
+        userId
+    );
+
+
+    /* =========================
+       显示当前用户
+       ========================= */
+
+    userInfo.innerHTML =
+        "当前用户：" + userId;
+
+
     spinning = true;
 
 
-    document.getElementById(
-        "spinButton"
-    ).disabled = true;
+    spinButton.disabled = true;
 
 
-    document.getElementById(
-        "result"
-    ).innerHTML =
+    userInput.disabled = true;
+
+
+    resultText.innerHTML =
         "✨ 转盘进行中...";
 
 
-    /*
+
+    /* =================================================
        随机决定最终结果
-    */
+       ================================================= */
 
     const resultIndex =
         Math.floor(
@@ -519,18 +643,20 @@ function spin(){
         numbers[resultIndex];
 
 
-    /*
-       每一格的角度
-    */
+
+    /* =================================================
+       每一格角度
+       ================================================= */
 
     const part =
         Math.PI * 2 /
         numbers.length;
 
 
-    /*
+
+    /* =================================================
        把目标数字转到正上方
-    */
+       ================================================= */
 
     const targetAngle =
         -Math.PI / 2
@@ -551,9 +677,10 @@ function spin(){
         targetAngle;
 
 
-    /*
-       至少旋转 6 圈
-    */
+
+    /* =================================================
+       至少旋转6圈
+       ================================================= */
 
     while(
         finalAngle <
@@ -565,6 +692,7 @@ function spin(){
             Math.PI * 2;
 
     }
+
 
 
     const startAngle =
@@ -584,6 +712,11 @@ function spin(){
         performance.now();
 
 
+
+    /* =================================================
+       动画
+       ================================================= */
+
     function animate(now){
 
         const elapsed =
@@ -599,9 +732,9 @@ function spin(){
             );
 
 
-        /*
+        /* =========================
            缓出效果
-        */
+           ========================= */
 
         const eased =
             1 -
@@ -620,6 +753,7 @@ function spin(){
         draw();
 
 
+
         if(progress < 1){
 
             requestAnimationFrame(
@@ -628,6 +762,11 @@ function spin(){
 
 
         }else{
+
+
+            /* =========================
+               转盘结束
+               ========================= */
 
             angle =
                 finalAngle;
@@ -640,28 +779,29 @@ function spin(){
                 false;
 
 
-            document.getElementById(
-                "spinButton"
-            ).disabled = false;
+            spinButton.disabled =
+                false;
 
 
-            document.getElementById(
-                "result"
-            ).innerHTML =
+            userInput.disabled =
+                false;
+
+
+            resultText.innerHTML =
                 "🎉 幸运数字：" +
                 resultNumber;
 
 
-            /*
-               转盘结束后保存：
 
-               用户编号
-               +
-               幸运数字
-            */
+            /* =========================
+               保存到 Supabase
+
+               用户ID + 结果
+               ========================= */
 
             saveResult(
-                resultNumber
+                resultNumber,
+                userId
             );
 
         }
@@ -674,6 +814,7 @@ function spin(){
     );
 
 }
+
 
 </script>
 
